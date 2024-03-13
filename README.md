@@ -82,12 +82,15 @@ package tech.ada.sistemabiblioteca.controller;
 package tech.ada.sistemabiblioteca.service;
 package tech.ada.sistemabiblioteca.repository;
 ```
+Será usado o ***Maven*** para gerenciar dependências entre bibliotecas e componentes do projeto e o ***Spring*** para as dependências entre as classes e os objetos.
 
 - `Controller` (anotação Spring `@Controller`) gerência da interface entre o usuário e a lógica da aplicação (Service); exposição da funcionalidade (no caso, APIs REST)
 - `Service` (anotação Spring `@Service`) implementação da lógica de negócio
 - `Repository` (anotação Spring `@Repository`) gerência do armazenamento
 
-Todas as três anotações são derivadas de `@Component`.
+Todas as três anotações são derivadas de `@Component`. Esta anotação e derivadas indicam ao Spring para que gerencie uma determinada classe.
+
+A anotação `@Autowired` do Spring define atributos que são gerenciados automaticamente (objetos e dependências instanciados e destruídos). Ela define a ***injeção de dependência*** de uma classe em outra classe.
 
 
 Referência para o [Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html):
@@ -99,3 +102,76 @@ Classe principal (base) do projeto anotada com `@SpringBootApplication`: meta-an
 
 Para serviços REST, o [Spring MVC](https://www.baeldung.com/spring-mvc-tutorial) (Model-View-Controller) fornece anotações `@RestController` e `@RequestMapping`. A @RestController é anotação tipo *stereotype* que: facilita leitura e indica o que uma classe deve fazer (neste caso, tratar requisições Web). A @RequestMapping é base para todas as especializações de requisições HTTP. Exemplo: @PostMapping é equivalente a @RequestMapping(method=POST). @RestController é uma especialização e inclui as anotações `@Controller` e `@ResponseBody`.
 
+# Modelo e Persistência
+
+## Classes
+Foram criadas as três classes no sistema: `Livro`, `Membro` e `Emprestimo`. Observações:
+- Todas foram anotadas com `@Entity` para indicar que são gerenciadas e persistidas pelo Hibernate.
+- Criados métodos Getters e Setters de forma manual. Poder ser usada a biblioteca ***Lombok*** através de anotações `@Getter` e `@Setter` que geram automaticamente os métodos durante a fase de compilação, evitando que sejam definidos manualmente.
+- Para o valor da multa acumulada no objeto Membro: a) tipo BigDecimal (Java possui classe Currency para representar moedas seguindo the ISO 4217); b) foi inicializado com zero no método setter.
+- Para o valor da multa por dia no objeto Emprestimo: deve ser ajustada durante a instanciação e definida conforme uma tabela.
+
+
+
+## Persistência
+
+Inclusão da dependência Spring para tratar a persistência dos objetos em bases de dados relacionais (H2 ou PostgreSQL, neste projeto).
+
+Dependência: `Spring Boot Starter Data JPA` (Starter for using Spring Data ***JPA*** with ***Hibernate***): fornece anotação `@Entity` para definir quais classes serão persistidas em BD usando a JPA (Java Persistence API). O framework ***Hibernate*** implementa a JPA e é definido como um ORM (Object Relationl Mapping). O acesso aos banco de dados é feito por meio da API JDBC (Java Database Connectivity) que é de nível mais básico.
+
+<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    <version>3.2.3</version>
+</dependency>
+
+Observações:
+- Questão do nome dos atributos de classe e do nome da coluna. Como SQL é case-insensitive, nomes são vertidos de forma automática pelo JPA. Para controlar os nomes das tabelas e das colunas (campos) no BD, são fornecidas as seguintes anotações: `@Table` e `@Column`. Segue exemplo da aplicação na classe Livro.
+- A JPA é fornecida pela biblioteca `jakarta.persistence` que deve ser importada nos arquivos de classe. Referência: [Jakarta Persistence](https://jakarta.ee/specifications/persistence/3.0/jakarta-persistence-spec-3.0.html)
+- JPA também define anotações para especificar e definir uma coluna como chave primária, no caso, o campo de `id` (`@Id`), e também como serão gerados os valores, através de `@GeneratedValues`. Formas: AUTO (padrão), IDENTITY, SEQUENCE e TABLE.
+- Deve ser fornecido um *construtor sem argumentos* (public Livro() {}) ou, se não especificado, será usado o padrão (vazio). Caso seja incluído um construtor parametrizado, então é obrigatório a inclusão do construtor vazio (sem argumentos).
+- Recurso para identificar o relationamento de tipos entre Java e Banco de Dados: [Hibernate ORM User Guide](https://docs.jboss.org/hibernate/orm/6.2/userguide/html_single/Hibernate_User_Guide.html)
+- Alguns mapeamentos: Java:LocalDate -> PSQL:DATE; Java:BigDecimal -> PSQL:NUMERIC ou DECIMAL
+- Em PostgreSQL pode especificar moedas usando o tipo `money` ou os [tipos numéricos](https://www.postgresql.org/docs/current/datatype-numeric.html) `numeric` e `decimal` no qual podem ser especificadas a precisão e escala. Exemplo para 4 dígitos significativos e 2 dígitos fracionarios: NUMERICA(4,2).
+
+```java
+@Entity
+@Table(name = "tb_livros")
+public class Livro {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String titulo;
+    private String isbn;
+
+    @Column(name = "autor_nome")
+    private String autorNome;
+```
+
+Outros parâmetros para a anotação de coluna (**nullable** é true por padrão; **insertable** também é true por padrão; length também tem tamanho padrão 255). Parâmetro unique pode especificar um coluna que não tenha valores repetidos, logo, pode compor chave primária.
+```java
+ @Column(name="editora_nome", nullable=true, insertable = true, length = 255, unique = true)
+```
+## Propriedades e Configuração da Persistência
+
+Banco de dados possuem configurações de acesso e as principais são:
+- Driver JDBC
+- Caminho ou URL para a base de dados
+- Usuário e senha
+
+No projeto Spring Boot elas ficam no arquivo de propriedades `application.properties` localizado em `src\main\resources`
+
+# Service
+
+Classes EmprestimoService, LivroService e MembroService que ligam a camada Web (*controller*) com a camada de persistência (*modelo*)
+
+# Controller
+
+As classes neste pacote definem a camada controladora (camada de apresentação no modelo MVC). Serão usadas as unidades básicas na arquitetura [Jakarta EE](https://jakarta.ee/) com a camada de abstração provida pelo Spring Boot.
+A plataaforma Jakarta EE especifica componentes e anotações que definem o comportamento dentro de um container de aplicação. A principal API é a ***Jakarta Servlet***, mas duas outras também são importantes: ***Filters*** e ***Listeners***. Servlets é o framework básico para Web que trata da interface entre requisições/respostas do protocolo HTTP e objetos Java. Servlets podem ser configurados via: mapeamento em arquivo web.xml (WEB-INF/web.xml - não muito usado) ou por meio de anotações.
+
+Anotações:
+- `@Consumes`: tipo de conteúdo (campo content-type da requisição HTTP) consumido pelo método
+- `@Produces`: tipo de conteúdo retornado.
