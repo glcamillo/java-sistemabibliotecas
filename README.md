@@ -39,7 +39,7 @@ Este é um projeto que tem a finalidade de usar a linguagem Java para implementa
 ## Frameworks de suporte
 
 [Spring Boot](https://spring.io/projects/spring-boot)
-Plataforma para criar aplicações auto-contidas (servidor de aplicações Tomcat/Jetty/Undertow incluído e configurado) e no qual o Spring configura dependências e inicializa os respectivos objetos através do padrão de Injeção de Dependências (DI - *Dependency Injection*).
+Plataforma para criar aplicações autocontidas (servidor de aplicações Tomcat/Jetty/Undertow incluído e configurado) e no qual o Spring configura dependências e inicializa os respectivos objetos através do padrão de Injeção de Dependências (DI - *Dependency Injection*).
 
 ### Persistência de dados
 
@@ -57,6 +57,84 @@ A arquitetura API RESTful apresentada em aula será base para este projeto de si
 - [Docker Swarm](https://docs.docker.com/engine/swarm/) para implementar de forma segura os valores de segredos (principalmente senhas).
 - [Jasypt](http://www.jasypt.org/) Recurso para cifrar/decifrar dados sensíveis em arquivos de recursos do projeto. Implementação mais recente com integração Spring devido a [Ulises Bocchio](https://github.com/ulisesbocchio/jasypt-spring-boot).
 - Autenticação para acesso a áreas da aplicação (***esperança***).
+- Testes unitários (***esperança***).
+
+# Configurações do projeto
+
+### Tags
+- ~~`v0.3` Modelo definido com as classes; persistência em memória (H2); endpoints para Livro e Membro para consulta via GET (todos os dados)~~
+- TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro
+- TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro
+- TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id
+- TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id
+- TODO: `v0.8` Endpoints para incluir empréstimo (POST) de Livro para um Membro
+- TODO: `v0.9` Endpoints para devolução de Livro e remoção de Empréstimo (DELETE) e cálculo de multa
+- TODO: `v1.0` Finalização do projeto básico.
+
+- Estão definidas no arquivo de propriedades `application.properties` localizado em `src\main\resources`.
+- Tanto para a configuração de banco de dados H2 quanto para PostgreSQL, o nome da base será `biblioteca`.
+- Serão incluídas configurações tanto para BD H2 quanto para PostgreSQL, sendo que será usado o H2 num primeiro momento para testes. 
+
+### Container Tomcat
+Porta local do container: 8082 (para não conflitar com porta 8080, padrão Tomcat)
+```properties
+server.port=8082
+```
+
+### Persistência: Conectividade e configuração H2
+
+Através de URL: jdbc:postgresql://localhost:8432/biblioteca
+
+Então, como configuração de banco de dados, tem-se:
+- Porta do servidor exposta: **8432**
+- Nome da base de dados: **todolist**
+- Nome de usuário para gerenciar essa base de dados: **uforadaprog** (atributos: Create DB)
+- Senha do usuário uforadaprog: definida durante criação do usuário (visto a seguir)
+- Senha do usuário `postgres`, administrador do banco de dados foi definida em um arquivo que será lido pelo PostgreSQL durante inicialização (criação da instância).
+- Nome das tabelas: **tarefas** e **usuarios**
+  Configuração parcial arquivo Dockerfile (`docker-compose-for-postgres.yml`)
+
+
+
+
+
+# Persistencia em BD H2
+spring.datasource.url=jdbc:h2:mem:todolistdb
+spring.datasource.driverClassName=org.h2.Driver
+
+###### Configurando com JSASYPT para cifragem de informacoes
+spring.datasource.username=ENC(gzdxhRpD3mqslnWK8n0IArjIJl6GQs56a7FSv75A5rzTlFoLi37qnU1bwJmlqipT)
+spring.datasource.password=ENC(dKFf9nGYtB2UxhoHtuqzbjXraFRoSBChG0PxccQa/2NSdxsBjAbrtBQ9WcR1oW9e)
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.h2.console.settings.trace=false
+spring.h2.console.settings.web-allow-others=false
+
+# Base de dados sempre ser� REECRIADA a cada reinicializacao
+spring.jpa.hibernate.ddl-auto=create
+
+# Persistencia em BD PostgreSQL
+#DATASOURCE POSTGRES
+#spring.datasource.driver-class-name=org.postgresql.Driver
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#spring.jpa.show-sql=true
+#spring.jpa.database=POSTGRESQL
+# Base de dados sempre ser� criada
+#spring.jpa.hibernate.ddl-auto=update
+#spring.sql.init.mode=always
+
+# Para uso com DOCKER
+# spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:8432/todolist}
+# spring.datasource.username=${SPRING_DATASOURCE_USERNAME:uforadaprog}
+# spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:"adatech BD PROG-WEB"}
+
+# Para uso de PostgreSQL instalado localmente
+#spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+#spring.datasource.username=postgres
+#spring.datasource.password=postgres
+
+# spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
 
 
 # Modelagem do projeto de Sistema de Bibliotecas
@@ -82,11 +160,19 @@ package tech.ada.sistemabiblioteca.controller;
 package tech.ada.sistemabiblioteca.service;
 package tech.ada.sistemabiblioteca.repository;
 ```
-Será usado o ***Maven*** para gerenciar dependências entre bibliotecas e componentes do projeto e o ***Spring*** para as dependências entre as classes e os objetos.
+Será usado o ***Maven*** para gerenciar dependências entre bibliotecas e componentes do projeto e o ***Spring*** para as dependências entre as classes e os objetos. O arquivo de configuração do Maven é o `pom.xml` e fica no diretório raiz do projeto.
+```text
+pom.xml (Project Object Model)
+  <groupId>br.ada.tech</groupId>  Indica organização
+  <artifactId>h2</artifactId>   Faz referência ao projeto em si
+```
+Obs: os comandos que invocam `mvn` em linha de comando devem ser executados a partir da raiz do projeto no qual esteja o arquivo pom.xml.
+
+Arquitetura MVC (Model-View-Controller) que consiste nas camadas de apresentação, domínio e fonte de dados.
 
 - `Controller` (anotação Spring `@Controller`) gerência da interface entre o usuário e a lógica da aplicação (Service); exposição da funcionalidade (no caso, APIs REST)
-- `Service` (anotação Spring `@Service`) implementação da lógica de negócio
-- `Repository` (anotação Spring `@Repository`) gerência do armazenamento
+- `Service` (anotação Spring `@Service`) implementação da ***lógica de negócio*** (lógica do domínio do negócio)
+- `Repository` (anotação Spring `@Repository`) gerência do armazenamento; ***persistência*** dos dados em um sistema de memória
 
 Todas as três anotações são derivadas de `@Component`. Esta anotação e derivadas indicam ao Spring para que gerencie uma determinada classe.
 
@@ -161,17 +247,104 @@ Banco de dados possuem configurações de acesso e as principais são:
 - Caminho ou URL para a base de dados
 - Usuário e senha
 
-No projeto Spring Boot elas ficam no arquivo de propriedades `application.properties` localizado em `src\main\resources`
+No projeto Spring Boot elas ficam no arquivo de propriedades `application.properties` localizado em `src/main/resources`. Algumas opções gerais de configuração JPA/Hibernate:
+```properties
+# Cria/Recria (create) tabelas a cada execução
+# Atualiza (update) a cada execução
+spring.jpa.hibernate.ddl-auto=update
 
-# Service
+# Propriedade que define inicialização por scripts (data.sql e schema.sql). Por padrão, H2 sempre será always. 
+spring.sql.init.mode=always
+
+# Propriedade para inicialização base dados antes de iniciado o Hibernate. Necessário, senão gera ERRO.
+spring.jpa.defer-datasource-initialization=true
+```
+
+Os comandos SQL de criação de tabelas e de inicialização de dados devem estar nos seguintes dois arquivos: `schema.sql` e `data.sql`. Ambos dentro do diretório de recursos: `src/main/resources`.
+
+
+### Persistência e banco de dados H2
+
+O banco de dados H2 ([https://h2database.com/](https://h2database.com/)) é um BD que opera em memória, mas permite criar persistências em:
+- Memória: jdbc:h2:mem:biblioteca (banco de dados biblioteca em memória)
+- Arquivo: jdbc:h2:/data/biblioteca (banco de dados biblioteca no diretório /data)
+
+Para tornar disponível o H2 para a aplicação, deve: a) configurar a dependência no Maven (pom.xml); e, b) configurar os parâmetros no arquivo de propriedades.
+```xml
+<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+<dependency>
+  <groupId>com.h2database</groupId>
+  <artifactId>h2</artifactId>
+  <version>2.2.224</version>
+  <scope>runtime</scope>
+</dependency>
+```
+
+
+
+
+## Service
 
 Classes EmprestimoService, LivroService e MembroService que ligam a camada Web (*controller*) com a camada de persistência (*modelo*)
 
-# Controller
+Todas as classes são anotadas `@Service` (anotação disponível pelo Spring: org.springframework.stereotype.Service).
+
+
+### Classe service para Livro
+
+@Service
+public class LivroService {
+public Iterable<Livro> getAll() {
+}
+}
+
+
+
+## Controller
 
 As classes neste pacote definem a camada controladora (camada de apresentação no modelo MVC). Serão usadas as unidades básicas na arquitetura [Jakarta EE](https://jakarta.ee/) com a camada de abstração provida pelo Spring Boot.
-A plataaforma Jakarta EE especifica componentes e anotações que definem o comportamento dentro de um container de aplicação. A principal API é a ***Jakarta Servlet***, mas duas outras também são importantes: ***Filters*** e ***Listeners***. Servlets é o framework básico para Web que trata da interface entre requisições/respostas do protocolo HTTP e objetos Java. Servlets podem ser configurados via: mapeamento em arquivo web.xml (WEB-INF/web.xml - não muito usado) ou por meio de anotações.
+
+A plataforma Jakarta EE especifica componentes e anotações que definem o comportamento dentro de um container de aplicação. A principal API é a ***Jakarta Servlet***, mas duas outras também são importantes: ***Filters*** e ***Listeners***. Servlets é o framework básico para Web que trata da interface entre requisições/respostas do protocolo HTTP e objetos Java. Servlets podem ser configurados via: mapeamento em arquivo web.xml (WEB-INF/web.xml - não muito usado) ou por meio de anotações.
+
+Para permitir que uma classe seja definida como controller, ela precisa ser anotada com `@RestController` fornecida pela dependência ***Spring Boot Starter Web***. Segue definição:
+```text
+Spring Boot Starter Web
+Starter for building web, including RESTful, applications using Spring MVC. Uses Tomcat as the default embedded container 
+```
+E, deve ser incluída a dependência no Maven (pom.xml).
+```xml
+<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+  <version>3.2.3</version>
+</dependency>
+```
+
+
+
+
 
 Anotações:
 - `@Consumes`: tipo de conteúdo (campo content-type da requisição HTTP) consumido pelo método
 - `@Produces`: tipo de conteúdo retornado.
+
+
+Classe que irá tratar as requisições HTTP.
+
+Anotação: @RestController
+@RestController (meta-annotation) = @Controller + @ResponseBody
+- @Controller, the dispatcher servlet talk to the ViewResolver to resolve the returned String to a view/page
+- @Controller: jsp/thymeleaf
+- @RequestMapping(value="/accounts", method=RequestMethod.GET,produces="text/html")
+  public String accountSummary() {
+  // Put data into model and return view name
+  return "summary";
+  }
+
+- @RestController, dispatcher servlet uses HttpMessageConverters to send back the raw response to the client in a request format - json/xml
+- @RequestMapping(value="/orders", method=RequestMethod.GET, produces="application/json")
+  @ResponseBody
+  public List<Order> getOrders {
+  return orderManager.getAllOrders();
+  }
