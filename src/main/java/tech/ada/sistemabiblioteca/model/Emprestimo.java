@@ -12,6 +12,11 @@ public class Emprestimo {
     private Long id;
 
     @Column(name = "membro_id")
+    /*
+        @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private UsuarioEntity usuario;
+     */
     private Long membroId;
     @Column(name = "livro_id")
     private Long livroId;
