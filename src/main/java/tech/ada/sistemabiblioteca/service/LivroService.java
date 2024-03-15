@@ -44,11 +44,7 @@ public class LivroService {
 
     public boolean findLivroByISBN(Livro livro){
         List<Livro> livroByISBN = this.livroFindByISBN.findByIsbn(livro.getIsbn());
-        if (livroByISBN.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+        return (livroByISBN.isEmpty()) ? false:true;
     }
 
 }

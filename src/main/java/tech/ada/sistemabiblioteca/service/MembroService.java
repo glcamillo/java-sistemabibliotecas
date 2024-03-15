@@ -7,6 +7,7 @@ import tech.ada.sistemabiblioteca.model.Livro;
 import tech.ada.sistemabiblioteca.model.Membro;
 import tech.ada.sistemabiblioteca.repository.MembroRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +28,16 @@ public class MembroService {
     public Membro getMembroById(Long id) {
         return this.membroRepository.findById(id).get();
     }
-    public Membro salvarMembro(Membro membro){
-        return this.membroRepository.save(membro);
-    }
 
+    // Criação de um novo objeto (newMembro) para ajustar valor de multa acumulada, que não
+    //   deve ser informada na requisição. Decisão de projeto.
+    public Membro salvarMembro(Membro membro) {
+        Membro newMembro = new Membro();
+        newMembro.setNome(membro.getNome());
+        newMembro.setSobrenome(membro.getSobrenome());
+        newMembro.setContato(membro.getContato());
+        newMembro.setEndereco(membro.getEndereco());
+        newMembro.setMultaAcumulada(BigDecimal.valueOf(0.0));
+        return this.membroRepository.save(newMembro);
+    }
 }

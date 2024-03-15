@@ -37,7 +37,7 @@ Este é um projeto que tem a finalidade de usar a linguagem Java para implementa
 
 ### Tags
 - [x] ~~`v0.3` Modelo definido com as classes; persistência em memória (H2); endpoints para Livro e Membro para consulta via GET (todos os dados)~~
-- [ ] TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro
+- [x] ~~TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro~~
 - [ ] TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro
 - [ ] TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id
 - [ ] TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id
