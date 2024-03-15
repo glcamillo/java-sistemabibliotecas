@@ -38,7 +38,6 @@ public class LivroController {
             livroService.salvarLivro(livro);
             return ResponseEntity.status(HttpStatus.CREATED).body(livro);
         } catch (Exception ex) {
-            //return ResponseEntity.badRequest().body(livro);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(livro);
         }
     }

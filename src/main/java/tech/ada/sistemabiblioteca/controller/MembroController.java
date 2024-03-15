@@ -37,7 +37,7 @@ public class MembroController {
     public ResponseEntity<Membro> salvarMembro(@RequestBody Membro membro){
         try {
             membroService.salvarMembro(membro);
-            return ResponseEntity.ok(membro);
+            return ResponseEntity.status(HttpStatus.CREATED).body(membro);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(membro);
         }
