@@ -7,6 +7,7 @@ import tech.ada.sistemabiblioteca.model.Livro;
 import tech.ada.sistemabiblioteca.repository.LivroFindByISBN;
 import tech.ada.sistemabiblioteca.repository.LivroRepository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,16 +27,11 @@ public class LivroService {
         return (List<Livro>) livroRepository.findAll();
     }
 
-    public Livro getLivroById(Long id) {
+    public Livro obterLivroById(Long id) {
         return this.livroRepository.findById(id).get();
     }
 
     public Livro salvarLivro(Livro livro){
-/*        if (this.livroRepository.findById(livro.getId()).isPresent()) {
-            this.livroRepository.findAll()
-            throw new RuntimeException("Livro com o mesmo identificador na base");
-        }
-        return this.livroRepository.save(livro); */
         if (this.findLivroByISBN(livro)) {
             throw new RuntimeException("Livro com o mesmo valor de ISBN na base de dados.");
         }
@@ -47,4 +43,12 @@ public class LivroService {
         return (livroByISBN.isEmpty()) ? false:true;
     }
 
+    public boolean removerLivroById(Long id) {
+        Optional<Livro> livro = this.livroRepository.findById(id);
+        if (livro.isPresent()) {
+            this.livroRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }

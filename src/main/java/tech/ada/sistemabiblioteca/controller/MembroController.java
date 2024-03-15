@@ -19,12 +19,12 @@ public class MembroController {
     @Autowired
     private MembroService membroService;
 
-    @GetMapping(value = "/all")
+    @GetMapping
     public List<Membro> getAllMembros() {
         return membroService.getAll();
     }
 
-    @GetMapping(value = "/membro/{id}")
+    @GetMapping(value = "{id}")
     public Membro getMembro(@PathVariable("id") Long id, HttpServletResponse response) {
         try {
             return membroService.getMembroById(id);
@@ -33,13 +33,22 @@ public class MembroController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Membro não encontrado");
         }
     }
-    @PostMapping(value = "/membro")
+    @PostMapping
     public ResponseEntity<Membro> salvarMembro(@RequestBody Membro membro){
         try {
             membroService.salvarMembro(membro);
             return ResponseEntity.status(HttpStatus.CREATED).body(membro);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(membro);
+        }
+    }
+
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<String> removerMembro(@PathVariable("id") Long id){
+        if (this.membroService.removerMembroById(id)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }

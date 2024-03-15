@@ -38,8 +38,8 @@ Este é um projeto que tem a finalidade de usar a linguagem Java para implementa
 ### Tags
 - [x] ~~`v0.3` Modelo definido com as classes; persistência em memória (H2); endpoints para Livro e Membro para consulta via GET (todos os dados)~~
 - [x] ~~TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro~~
-- [ ] TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro
-- [ ] TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id
+- [x] ~~TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro~~
+- [x] ~~TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id~~
 - [ ] TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id
 - [ ] TODO: `v0.8` Endpoints para incluir empréstimo (POST) de Livro para um Membro
 - [ ] TODO: `v0.9` Endpoints para devolução de Livro e remoção de Empréstimo (DELETE) e cálculo de multa
@@ -70,7 +70,7 @@ A arquitetura API RESTful apresentada em aula será base para este projeto de si
 
 # Configurações do projeto
 
-- Estão definidas no arquivo de propriedades `application.properties` localizado em `src\main\resources`.
+- Estão definidas no arquivo de propriedades `application.properties` localizado em `src/main/resources`.
 - Tanto para a configuração de banco de dados H2 quanto para PostgreSQL, o nome da base será `biblioteca`.
 - Serão incluídas configurações tanto para BD H2 quanto para PostgreSQL, sendo que será usado o H2 num primeiro momento para testes. 
 
@@ -88,16 +88,21 @@ URL de acesso à interface de gerenciamento H2: [http://localhost:8082/h2-consol
  
 ### Persistência: Conectividade e configuração PostgreSQL
 
-Através de URL: jdbc:postgresql://localhost:8432/biblioteca
+Através de URL: `jdbc:postgresql://localhost:8432/biblioteca`
 
-Então, como configuração de banco de dados, tem-se:
+Configuração de banco de dados:
 - Porta do servidor exposta: **8432**
-- Nome da base de dados: **biblioteca**
+- Nome da base de dados: **biblioteca** (*deve ser criada antes de iniciar a aplicação*)
 - Nome de usuário para gerenciar essa base de dados: **biblioadmin** (atributos: Create DB)
 - Senha do usuário biblioadmin: definida durante criação do usuário (visto a seguir)
 - Senha do usuário `postgres`, administrador do banco de dados foi definida em um arquivo que será lido pelo PostgreSQL durante inicialização (criação da instância).
 - Nome das tabelas: ***tb_livros***, ***tb_membros*** e ***tb_emprestimos*** 
-  Configuração parcial arquivo Dockerfile (`docker-compose-for-postgres.yml`)
+- 
+Arquivos para criar imagens Docker para PostgreSQL:
+- `docker-compose-for-postgres-without-secrets.yml`  Arquivo básico para conf padrão: postgres; 5432
+- `docker-compose-for-postgres-with-secrets.yml`  Arquivo básico para conf que salva segredos (senhas, p.ex.) no sistema e torna disponível ao container sem que essa informação seja vazada em arquivos de texto (e venham parar no GitHub); porta:8432
+
+> TODO: não implementado até à ultima versão. Usado em projetos anteriores.
 
 # Modelagem do projeto de Sistema de Bibliotecas
 
@@ -159,7 +164,7 @@ Foram criadas as três classes no sistema: `Livro`, `Membro` e `Emprestimo`. Obs
 - Para o valor da multa acumulada no objeto Membro: a) tipo BigDecimal (Java possui classe Currency para representar moedas seguindo the ISO 4217); b) foi inicializado com zero no método setter.
 - Para o valor da multa por dia no objeto Emprestimo: deve ser ajustada durante a instanciação e definida conforme uma tabela.
 
-
+> TODO: não foram usadas classes DTO em função da limitação de tempo.
 
 ## Persistência
 
@@ -248,31 +253,21 @@ Para tornar disponível o H2 para a aplicação, deve: a) configurar a dependên
 
 ## Service
 
-Classes EmprestimoService, LivroService e MembroService que ligam a camada Web (*controller*) com a camada de persistência (*modelo*)
+Classes EmprestimoService, LivroService e MembroService que ligam a camada Web (*controller*) com a camada de persistência (*modelo*). Métodos nas classes controladoras chamam métodos nas classes services que fazem o processamento e a lógica da aplicação.
 
 Todas as classes são anotadas `@Service` (anotação disponível pelo Spring: org.springframework.stereotype.Service).
-
-
-### Classe service para Livro
-
-@Service
-public class LivroService {
-public Iterable<Livro> getAll() {
-}
-}
-
 
 
 ## Controller
 
 A arquitetura é baseada em API RESTful no qual a interface com a aplicação ocorre por meio de métodos HTTP. O modelo CRUD (Create, Read, Update, Delete) define ações (uma API) para gerenciamento de persistência (banco de dados). Ele pode ser modelado usando métodos HTTP, conforme seguinte correspondência:
-Ação CRUD e correspondente método HTTP:
+Ação CRUD e correspondente ***método HTTP*** (***verbos RESTful***):
 - ***Create*** 	POST, PUT if we have `id` or `uuid`
 - ***Read*** 	GET
-- ***Update*** 	PUT to replace, PATCH to modify
+- ***Update*** 	PUT (replace), PATCH (modify)
 - ***Delete*** 	DELETE
 
-Para fins de informação, há uma especificação aberta para APIs: [Swagger OpenAPI Specification](https://swagger.io/specification/v3/)
+Há uma especificação aberta para APIs: [Swagger OpenAPI Specification](https://swagger.io/specification/v3/)
 > *The OpenAPI Specification (OAS) defines a standard, language-agnostic interface to RESTful APIs which allows both humans and computers to discover and understand the capabilities of the service without access to source code, documentation, or through network traffic inspection. When properly defined, a consumer can understand and interact with the remote service with a minimal amount of implementation logic.*
 
 As classes neste pacote definem a camada controladora (camada de apresentação no modelo MVC). Serão usadas as unidades básicas na arquitetura [Jakarta EE](https://jakarta.ee/) com a camada de abstração provida pelo Spring Boot. O modo como é criada a resposta define uma diferença básica entre MVC e RESTful: na MVC, o servidor gerencia a visão (como são geradas e retornadas as páginas), enquanto que na RESTful o objeto retornado é escrito dentro de resposta HTTP (usando JSON ou mesmo XML - não há renderização no resolvedor). Arquitetura MVC conforme definida pela Spring e disponível em [Quick Guide to Spring Controllers](https://www.baeldung.com/spring-controllers). 
@@ -302,54 +297,32 @@ Ao usar Spring Web, o retorno já é convertido em JSON através do uso da bibli
 [INFO] |  +- org.springframework.boot:spring-boot-starter-json:jar:3.2.3:compile
 [INFO] |  |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.15.4:compile
 ```
+
+
 ## Método GET
 
-```java
-    public Livro getLivroById(Long id) {
-        return this.livroRepository.findById(id).get();
-    }
-```
+
 
 ## Método POST
 
+Verbo RESTful POST para enviar informação com o objetivo de persistir a mesma no banco de dados.
+
 > Serviços RESTful devem retornar a URI da representação dos dados que foram recebidos e persistidos na aplicação. Neste projeto somente são retornados os dados do objeto no corpo.
 
-Requisitos para o método POST de ***Livro***:
+Método POST de ***Livro***:
 - Dados Livro enviados via POST são verificados se existe outro livro na base com mesmo ISBN (tipo String).
-- Se livro não existir, será criado: retornado HTTP Status 201 (CREATED)
-- Se livro existir quanto ao mesmo ISBN, então será retornado HTTP Status 409 (CONFLICT);
+- Se livro não existir, será criado: retornado HTTP Status ***201*** (***CREATED***)
+- Se livro existir quanto ao mesmo ISBN, então será retornado HTTP Status ***409*** (***CONFLICT***);
 
-Método POST para ***Membro***: sempre será criada a instância na base de dados, cada qual com valor Id (gerado automaticamente) diferente.
+Método POST para ***Membro***: sempre será criada a instância na base de dados, cada qual com valor Id (gerado automaticamente) diferente. Logo, todo POST (se não gerar erro) irá resultar em HTTP Status ***201*** (***CREATED***)
 
 ## Método DELETE
 
+Verbo RESTful DELETE para excluir uma entrada no banco de dados. Com sucesso, retorna HTTP Status ***200*** (***OK***), ou 404 (quando não encontrado). Segue um extrato referenciando o respectivo livro:
 > According to the RESTful Web Services Cookbook: *The DELETE method is idempotent. This implies that the server must return response code 200 (OK) even if the server deleted the resource in a previous request. But in practice, implementing DELETE as an idempotent operation requires the server to keep track of all deleted resources. Otherwise, it can return a 404 (Not Found). 
 >  A server MAY return a 404 Not Found status code if a deletion request fails due to the resource not existing.
-> 
-
-Anotações:
-- `@Consumes`: tipo de conteúdo (campo content-type da requisição HTTP) consumido pelo método
-- `@Produces`: tipo de conteúdo retornado.
 
 
-Classe que irá tratar as requisições HTTP.
-
-Anotação: @RestController
-@RestController (meta-annotation) = @Controller + @ResponseBody
-- @Controller, the dispatcher servlet talk to the ViewResolver to resolve the returned String to a view/page
-- @Controller: jsp/thymeleaf
-- @RequestMapping(value="/accounts", method=RequestMethod.GET,produces="text/html")
-  public String accountSummary() {
-  // Put data into model and return view name
-  return "summary";
-  }
-
-
-- @RequestMapping(value="/orders", method=RequestMethod.GET, produces="application/json")
-  @ResponseBody
-  public List<Order> getOrders {
-  return orderManager.getAllOrders();
-  }
 
 ## Respostas (códigos e mensagens)
 
@@ -368,13 +341,21 @@ Date: Sat, 26 Dec 2020 19:38:09 GMT
     "path": "/actor/8"
 }
 ```
-Referências: [Spring ResponseStatusException](https://www.baeldung.com/spring-response-status-exception): por padrão, versões mais recentes do Spring não incluem mensagens de erro por questões de erro.
-
-Argumentos para o construtor de Resposta HTTP: `ResponseStatusException`:
+Referências: [Spring ResponseStatusException](https://www.baeldung.com/spring-response-status-exception): por padrão, versões mais recentes do Spring não incluem mensagens de erro por questões de segurança. Argumentos para o construtor de Resposta HTTP: `ResponseStatusException`:
 - status – an HTTP status set to the HTTP response
 - reason – a message explaining the exception set to the HTTP response
 - cause – a Throwable cause of the ResponseStatusException
 
+> TODO: faltou implementar gerenciamento de erros mais robusto e respostas HTTP mais consistentes com a arquitetura RESTful.
+
+# Teste das requisições
+
+Há um arquivo de script Bash Shell que usa o aplicativo curl ([cURL](https://curl.se/)) para gerar requisições HTTP. O script `sistemabiblio-test-api.sh` está em `~/java-sistemabibliotecas/testes-e-script/` e deve ser executado da seguinte forma:
+```shell
+$ chmod u+x sistemabiblio-test-api.sh
+$ ./sistemabiblio-test-api.sh
+```
+Obs.: as requisições são geradas conforme o seguinte endereço: http://localhost:8082
 
 
 Referência geral:
