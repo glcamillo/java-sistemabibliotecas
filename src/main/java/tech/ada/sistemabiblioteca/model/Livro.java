@@ -15,7 +15,7 @@ public class Livro {
     @Column(name = "autor_sobrenome")
     private String autorSobrenome;
     @Column(name = "ano_publicacao")
-    private String anoPublicacao;
+    private Integer anoPublicacao;
     @Column(name = "editora_nome")
     private String editoraNome;
     private Boolean emprestado;
@@ -60,11 +60,11 @@ public class Livro {
         this.autorSobrenome = autorSobrenome;
     }
 
-    public String getAnoPublicacao() {
+    public Integer getAnoPublicacao() {
         return anoPublicacao;
     }
 
-    public void setAnoPublicacao(String anoPublicacao) {
+    public void setAnoPublicacao(Integer anoPublicacao) {
         this.anoPublicacao = anoPublicacao;
     }
 
