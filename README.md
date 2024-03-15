@@ -33,8 +33,17 @@ Considere apenas relacionamentos 1:1
 Este é um projeto que tem a finalidade de usar a linguagem Java para implementar um serviço RESTful de controle para um sistema de bibliotecas. Entidades básicas: livros, membros e empréstimos. A interface de acesso será via métodos HTTP acessando endpoints e provendo operações [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) (operações de Create, Read, Update e Delete). Originalmente, operações CRUD foram relacionadas com persistência de dados e há comandos SQL para cada operação. Em arquitetura de APIs RESTfull, métodos HTTP são usados com este objetivo.
 
 ### Disclaimer
-*As informações neste Readme.md contém informações sobre o projeto (construção e execução) mas também apresenta informações com o fim de documentar questões, problemas e algumas soluções que surgiram durante o desenvolvimento e aperfeiçoamento.*
+> *As informações neste Readme.md contém informações sobre o projeto (construção e execução) mas também apresenta informações com o fim de documentar questões, problemas e algumas soluções que surgiram durante o desenvolvimento e aperfeiçoamento.*
 
+### Tags
+- [x] ~~`v0.3` Modelo definido com as classes; persistência em memória (H2); endpoints para Livro e Membro para consulta via GET (todos os dados)~~
+- [ ] TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro
+- [ ] TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro
+- [ ] TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id
+- [ ] TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id
+- [ ] TODO: `v0.8` Endpoints para incluir empréstimo (POST) de Livro para um Membro
+- [ ] TODO: `v0.9` Endpoints para devolução de Livro e remoção de Empréstimo (DELETE) e cálculo de multa
+- [ ] TODO: `v1.0` Finalização do projeto básico.
 
 ## Frameworks de suporte
 
@@ -61,16 +70,6 @@ A arquitetura API RESTful apresentada em aula será base para este projeto de si
 
 # Configurações do projeto
 
-### Tags
-- ~~`v0.3` Modelo definido com as classes; persistência em memória (H2); endpoints para Livro e Membro para consulta via GET (todos os dados)~~
-- TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro
-- TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro
-- TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id
-- TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id
-- TODO: `v0.8` Endpoints para incluir empréstimo (POST) de Livro para um Membro
-- TODO: `v0.9` Endpoints para devolução de Livro e remoção de Empréstimo (DELETE) e cálculo de multa
-- TODO: `v1.0` Finalização do projeto básico.
-
 - Estão definidas no arquivo de propriedades `application.properties` localizado em `src\main\resources`.
 - Tanto para a configuração de banco de dados H2 quanto para PostgreSQL, o nome da base será `biblioteca`.
 - Serão incluídas configurações tanto para BD H2 quanto para PostgreSQL, sendo que será usado o H2 num primeiro momento para testes. 
@@ -82,67 +81,30 @@ server.port=8082
 ```
 
 ### Persistência: Conectividade e configuração H2
+URL de acesso à interface de gerenciamento H2: [http://localhost:8082/h2-console](http://localhost:8082/h2-console)
+- Nome da base de dados: **biblioteca** 
+- Nome de usuário: ***sa***
+- Senha do usuário sa: ***password***
+ 
+### Persistência: Conectividade e configuração PostgreSQL
 
 Através de URL: jdbc:postgresql://localhost:8432/biblioteca
 
 Então, como configuração de banco de dados, tem-se:
 - Porta do servidor exposta: **8432**
-- Nome da base de dados: **todolist**
-- Nome de usuário para gerenciar essa base de dados: **uforadaprog** (atributos: Create DB)
-- Senha do usuário uforadaprog: definida durante criação do usuário (visto a seguir)
+- Nome da base de dados: **biblioteca**
+- Nome de usuário para gerenciar essa base de dados: **biblioadmin** (atributos: Create DB)
+- Senha do usuário biblioadmin: definida durante criação do usuário (visto a seguir)
 - Senha do usuário `postgres`, administrador do banco de dados foi definida em um arquivo que será lido pelo PostgreSQL durante inicialização (criação da instância).
-- Nome das tabelas: **tarefas** e **usuarios**
+- Nome das tabelas: ***tb_livros***, ***tb_membros*** e ***tb_emprestimos*** 
   Configuração parcial arquivo Dockerfile (`docker-compose-for-postgres.yml`)
-
-
-
-
-
-# Persistencia em BD H2
-spring.datasource.url=jdbc:h2:mem:todolistdb
-spring.datasource.driverClassName=org.h2.Driver
-
-###### Configurando com JSASYPT para cifragem de informacoes
-spring.datasource.username=ENC(gzdxhRpD3mqslnWK8n0IArjIJl6GQs56a7FSv75A5rzTlFoLi37qnU1bwJmlqipT)
-spring.datasource.password=ENC(dKFf9nGYtB2UxhoHtuqzbjXraFRoSBChG0PxccQa/2NSdxsBjAbrtBQ9WcR1oW9e)
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
-spring.h2.console.settings.trace=false
-spring.h2.console.settings.web-allow-others=false
-
-# Base de dados sempre ser� REECRIADA a cada reinicializacao
-spring.jpa.hibernate.ddl-auto=create
-
-# Persistencia em BD PostgreSQL
-#DATASOURCE POSTGRES
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-#spring.jpa.show-sql=true
-#spring.jpa.database=POSTGRESQL
-# Base de dados sempre ser� criada
-#spring.jpa.hibernate.ddl-auto=update
-#spring.sql.init.mode=always
-
-# Para uso com DOCKER
-# spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:8432/todolist}
-# spring.datasource.username=${SPRING_DATASOURCE_USERNAME:uforadaprog}
-# spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:"adatech BD PROG-WEB"}
-
-# Para uso de PostgreSQL instalado localmente
-#spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
-#spring.datasource.username=postgres
-#spring.datasource.password=postgres
-
-# spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
-
 
 # Modelagem do projeto de Sistema de Bibliotecas
 
 A imagem da figura a seguir apresenta o diagrama Entidade-Relacionamento relativos à persistência dos dados que são criados e geridos pela aplicação.
 
 ## Diagrama de classes básico do projeto
-<img src="./imagens/drawSQL-diagrama-ER-biblioteca-ONE-to-ONE.png" alt="Diagrama ER do modelo de bibliotecas">
+!["Diagrama ER do modelo de bibliotecas"](./imagens/drawSQL-diagrama-ER-biblioteca-ONE-to-ONE.png)
 
 Algumas considerações sobre as estruturas de dados:
 - Considerando a restrição de relacionamentos 1:1, cada livro só terá um autor e cada usuário só pode emprestar um único livro.
@@ -181,7 +143,7 @@ A anotação `@Autowired` do Spring define atributos que são gerenciados automa
 
 Referência para o [Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html):
 
-Pacote base: package tech.ada.biblioteca;
+> Pacote base: package tech.ada.biblioteca;
 
 Classe principal (base) do projeto anotada com `@SpringBootApplication`: meta-anotação que combina `@SpringBootConfiguration`, `@EnableAutoConfiguration` e `@ComponentScan`. Elas tratam da configuração automática, suporte a propriedades e gerenciamento das dependências (varredura de componentes no diretório do projeto) para prover um ambiente de execução das aplicações.
 
@@ -203,7 +165,7 @@ Foram criadas as três classes no sistema: `Livro`, `Membro` e `Emprestimo`. Obs
 
 Inclusão da dependência Spring para tratar a persistência dos objetos em bases de dados relacionais (H2 ou PostgreSQL, neste projeto).
 
-Dependência: `Spring Boot Starter Data JPA` (Starter for using Spring Data ***JPA*** with ***Hibernate***): fornece anotação `@Entity` para definir quais classes serão persistidas em BD usando a JPA (Java Persistence API). O framework ***Hibernate*** implementa a JPA e é definido como um ORM (Object Relationl Mapping). O acesso aos banco de dados é feito por meio da API JDBC (Java Database Connectivity) que é de nível mais básico.
+Dependência: `Spring Boot Starter Data JPA` (Starter for using Spring Data ***JPA*** with ***Hibernate***): fornece anotação `@Entity` para definir quais classes (POJOs - [Plain Old Java Object](https://www.baeldung.com/java-pojo-class)) serão persistidas em BD usando a JPA (Java Persistence API). O framework ***Hibernate*** implementa a JPA e é definido como um ORM (Object Relationl Mapping). O acesso aos banco de dados é feito por meio da API JDBC (Java Database Connectivity) que é de nível mais básico.
 
 <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 <dependency>
@@ -260,7 +222,8 @@ spring.sql.init.mode=always
 spring.jpa.defer-datasource-initialization=true
 ```
 
-Os comandos SQL de criação de tabelas e de inicialização de dados devem estar nos seguintes dois arquivos: `schema.sql` e `data.sql`. Ambos dentro do diretório de recursos: `src/main/resources`.
+Os comandos SQL de criação de tabelas e de inicialização de dados devem estar nos seguintes dois arquivos: `schema.sql` e `data.sql`. Ambos dentro do diretório de recursos: `src/main/resources`. Algumas observações:
+- Comando `ALTER TABLE "biblioteca.tb_membros" OWNER TO "sa";` não funciona em H2, logo, só em PostgreSQL.
 
 
 ### Persistência e banco de dados H2
@@ -302,7 +265,19 @@ public Iterable<Livro> getAll() {
 
 ## Controller
 
-As classes neste pacote definem a camada controladora (camada de apresentação no modelo MVC). Serão usadas as unidades básicas na arquitetura [Jakarta EE](https://jakarta.ee/) com a camada de abstração provida pelo Spring Boot.
+A arquitetura é baseada em API RESTful no qual a interface com a aplicação ocorre por meio de métodos HTTP. O modelo CRUD (Create, Read, Update, Delete) define ações (uma API) para gerenciamento de persistência (banco de dados). Ele pode ser modelado usando métodos HTTP, conforme seguinte correspondência:
+Ação CRUD e correspondente método HTTP:
+- ***Create*** 	POST, PUT if we have `id` or `uuid`
+- ***Read*** 	GET
+- ***Update*** 	PUT to replace, PATCH to modify
+- ***Delete*** 	DELETE
+
+Para fins de informação, há uma especificação aberta para APIs: [Swagger OpenAPI Specification](https://swagger.io/specification/v3/)
+> *The OpenAPI Specification (OAS) defines a standard, language-agnostic interface to RESTful APIs which allows both humans and computers to discover and understand the capabilities of the service without access to source code, documentation, or through network traffic inspection. When properly defined, a consumer can understand and interact with the remote service with a minimal amount of implementation logic.*
+
+As classes neste pacote definem a camada controladora (camada de apresentação no modelo MVC). Serão usadas as unidades básicas na arquitetura [Jakarta EE](https://jakarta.ee/) com a camada de abstração provida pelo Spring Boot. O modo como é criada a resposta define uma diferença básica entre MVC e RESTful: na MVC, o servidor gerencia a visão (como são geradas e retornadas as páginas), enquanto que na RESTful o objeto retornado é escrito dentro de resposta HTTP (usando JSON ou mesmo XML - não há renderização no resolvedor). Arquitetura MVC conforme definida pela Spring e disponível em [Quick Guide to Spring Controllers](https://www.baeldung.com/spring-controllers). 
+
+![Spring MVC](./imagens/BAELDUNG-Spring-MVC.png)
 
 A plataforma Jakarta EE especifica componentes e anotações que definem o comportamento dentro de um container de aplicação. A principal API é a ***Jakarta Servlet***, mas duas outras também são importantes: ***Filters*** e ***Listeners***. Servlets é o framework básico para Web que trata da interface entre requisições/respostas do protocolo HTTP e objetos Java. Servlets podem ser configurados via: mapeamento em arquivo web.xml (WEB-INF/web.xml - não muito usado) ou por meio de anotações.
 
@@ -321,9 +296,36 @@ E, deve ser incluída a dependência no Maven (pom.xml).
 </dependency>
 ```
 
+Ao usar Spring Web, o retorno já é convertido em JSON através do uso da biblioteca Jackson 2, incluída como dependência, conforme resultado do comando `mvn dependency:tree`:
+```text
+[INFO] +- org.springframework.boot:spring-boot-starter-web:jar:3.2.3:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-json:jar:3.2.3:compile
+[INFO] |  |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.15.4:compile
+```
+## Método GET
 
+```java
+    public Livro getLivroById(Long id) {
+        return this.livroRepository.findById(id).get();
+    }
+```
 
+## Método POST
 
+> Serviços RESTful devem retornar a URI da representação dos dados que foram recebidos e persistidos na aplicação. Neste projeto somente são retornados os dados do objeto no corpo.
+
+Requisitos para o método POST de ***Livro***:
+- Dados Livro enviados via POST são verificados se existe outro livro na base com mesmo ISBN (tipo String).
+- Se livro não existir, será criado: retornado HTTP Status 201 (CREATED)
+- Se livro existir quanto ao mesmo ISBN, então será retornado HTTP Status 409 (CONFLICT);
+
+Método POST para ***Membro***: sempre será criada a instância na base de dados, cada qual com valor Id (gerado automaticamente) diferente.
+
+## Método DELETE
+
+> According to the RESTful Web Services Cookbook: *The DELETE method is idempotent. This implies that the server must return response code 200 (OK) even if the server deleted the resource in a previous request. But in practice, implementing DELETE as an idempotent operation requires the server to keep track of all deleted resources. Otherwise, it can return a 404 (Not Found). 
+>  A server MAY return a 404 Not Found status code if a deletion request fails due to the resource not existing.
+> 
 
 Anotações:
 - `@Consumes`: tipo de conteúdo (campo content-type da requisição HTTP) consumido pelo método
@@ -342,9 +344,38 @@ Anotação: @RestController
   return "summary";
   }
 
-- @RestController, dispatcher servlet uses HttpMessageConverters to send back the raw response to the client in a request format - json/xml
+
 - @RequestMapping(value="/orders", method=RequestMethod.GET, produces="application/json")
   @ResponseBody
   public List<Order> getOrders {
   return orderManager.getAllOrders();
   }
+
+## Respostas (códigos e mensagens)
+
+A anotação Spring `@RestController` indica que o `servlet dispatcher` usa ***HttpMessageConverters*** para retornar respostas raw ao cliente usando formatos json/xml.
+
+Padrão de mensagens (em JSON) de ***ERRO*** geradas pelo Spring:
+```json
+HTTP/1.1 404
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sat, 26 Dec 2020 19:38:09 GMT
+{
+    "timestamp": "2020-12-26T19:38:09.426+00:00",
+    "status": 404,
+    "error": "Not Found",
+    "path": "/actor/8"
+}
+```
+Referências: [Spring ResponseStatusException](https://www.baeldung.com/spring-response-status-exception): por padrão, versões mais recentes do Spring não incluem mensagens de erro por questões de erro.
+
+Argumentos para o construtor de Resposta HTTP: `ResponseStatusException`:
+- status – an HTTP status set to the HTTP response
+- reason – a message explaining the exception set to the HTTP response
+- cause – a Throwable cause of the ResponseStatusException
+
+
+
+Referência geral:
+- [Sintaxe básica de gravação e formatação no GitHub](https://docs.github.com/pt/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
