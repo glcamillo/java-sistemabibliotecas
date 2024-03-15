@@ -3,7 +3,6 @@ package tech.ada.sistemabiblioteca.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import tech.ada.sistemabiblioteca.model.Livro;
 import tech.ada.sistemabiblioteca.model.Membro;
 import tech.ada.sistemabiblioteca.repository.MembroRepository;
 
@@ -39,5 +38,14 @@ public class MembroService {
         newMembro.setEndereco(membro.getEndereco());
         newMembro.setMultaAcumulada(BigDecimal.valueOf(0.0));
         return this.membroRepository.save(newMembro);
+    }
+
+    public boolean removerMembroById(Long id) {
+        Optional<Membro> membro = this.membroRepository.findById(id);
+        if (membro.isPresent()) {
+            this.membroRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
