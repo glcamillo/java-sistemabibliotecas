@@ -1,5 +1,6 @@
 package tech.ada.sistemabiblioteca.service;
 
+import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +51,22 @@ public class LivroService {
             return true;
         }
         return false;
+    }
+
+    public Livro atualizarLivro(Livro livro) {
+        Optional<Livro> optionalLivro = this.livroRepository.findById(livro.getId());
+        if (optionalLivro.isPresent()) {
+            Livro livroAlterado = optionalLivro.get();
+            livroAlterado.setTitulo(livro.getTitulo());
+            livroAlterado.setIsbn(livro.getIsbn());
+            livroAlterado.setAutorNome(livro.getAutorNome());
+            livroAlterado.setAutorSobrenome(livro.getAutorSobrenome());
+            livroAlterado.setAnoPublicacao(livro.getAnoPublicacao());
+            livroAlterado.setEditoraNome(livro.getEditoraNome());
+            livroAlterado.setEmprestado(livro.getEmprestado());
+            return this.livroRepository.save(livroAlterado);
+        } else {
+            throw new RuntimeException("Livro não encontrado");
+        }
     }
 }
