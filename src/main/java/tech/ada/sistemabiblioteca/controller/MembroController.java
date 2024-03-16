@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.server.ResponseStatusException;
 
+import tech.ada.sistemabiblioteca.model.Livro;
 import tech.ada.sistemabiblioteca.model.Membro;
 import tech.ada.sistemabiblioteca.service.MembroService;
 
@@ -36,8 +37,7 @@ public class MembroController {
     @PostMapping
     public ResponseEntity<Membro> salvarMembro(@RequestBody Membro membro){
         try {
-            membroService.salvarMembro(membro);
-            return ResponseEntity.status(HttpStatus.CREATED).body(membro);
+            return ResponseEntity.status(HttpStatus.CREATED).body(membroService.salvarMembro(membro));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(membro);
         }
@@ -49,6 +49,16 @@ public class MembroController {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping
+    public ResponseEntity<Membro> atualizarMembro(@RequestBody Membro membro){
+        try {
+            membroService.atualizarMembro(membro);
+            return ResponseEntity.status(HttpStatus.OK).body(membro);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

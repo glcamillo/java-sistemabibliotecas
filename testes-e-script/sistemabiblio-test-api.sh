@@ -41,8 +41,8 @@ fi
 
 # Para salvar em arquivo, usar opção -o file.json
 
-
-echo -e "\n ====   Testes com resultados ESPERADOS (sem ERRO) ===\n"
+echo -e "\n\n\n  ====================================================================="
+echo -e "                 Testes com resultados ESPERADOS (sem ERRO)      \n\n"
 
 
 echo -e '\n\n ***************    GET Livro  ****************************'
@@ -82,9 +82,19 @@ echo -e "\n    $CURL -i -s -X DELETE 'http://localhost:8082/membros/2' \n"
 $CMD -i -s -X DELETE 'http://localhost:8082/membros/2'
 
 
+echo -e '\n\n ************      PUT Livro (ano publicação:2024)     *************************'
+echo -e "\n    $CURL -i -s --header 'Content-Type:application/json' -X PUT -d '{"id":1,"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros \n"
+$CMD -i --header 'Content-Type:application/json' -X PUT -d '{"id":1,"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros
 
-echo -e "\n\n  ====================================================================="
-echo -e "           Testes que devem gerar ERRO      \n\n"
+
+echo -e '\n\n ************      PUT Membro (contato:para@gmail.com)     *************************'
+echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":1,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros/membro \n"
+$CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":1,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros
+
+
+
+echo -e "\n\n\n  ====================================================================="
+echo -e "                 Testes que devem gerar ERRO      \n\n"
 
 echo -e '\n\n *********   GET  Livro (id não existe) -> HTTP 404   *****************'
 echo -e "\n    $CURL -i -s -X GET 'http://localhost:8082/livros/10' \n"
@@ -113,6 +123,17 @@ echo -e '\n\n **************   DELETE  (Id não existe) -> 404  **************'
 
 echo -e "\n    $CURL -i -s -X DELETE 'http://localhost:8082/membros/20' \n"
 $CMD -i -s -X DELETE 'http://localhost:8082/membros/20'
+
+
+
+echo -e '\n\n ************      PUT Livro (inexistente) -> 404     *************************'
+echo -e "\n    $CURL -i -s --header 'Content-Type:application/json' -X PUT -d '{"id":300,"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros \n"
+$CMD -i --header 'Content-Type:application/json' -X PUT -d '{"id":300,"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros
+
+
+echo -e '\n\n ************      PUT Membro (inexistente) -> 404    *************************'
+echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":300,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros/membro \n"
+$CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":300,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros
 
 
 

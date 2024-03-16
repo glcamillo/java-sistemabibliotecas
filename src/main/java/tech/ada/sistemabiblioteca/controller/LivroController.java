@@ -50,4 +50,13 @@ public class LivroController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PutMapping
+    public ResponseEntity<Livro> atualizarLivro(@RequestBody Livro livro){
+        try {
+            livroService.atualizarLivro(livro);
+            return ResponseEntity.status(HttpStatus.OK).body(livro);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }

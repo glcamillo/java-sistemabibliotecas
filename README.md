@@ -40,7 +40,7 @@ Este é um projeto que tem a finalidade de usar a linguagem Java para implementa
 - [x] ~~TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro~~
 - [x] ~~TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro~~
 - [x] ~~TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id~~
-- [ ] TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id
+- [x] ~~TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id~~
 - [ ] TODO: `v0.8` Endpoints para incluir empréstimo (POST) de Livro para um Membro
 - [ ] TODO: `v0.9` Endpoints para devolução de Livro e remoção de Empréstimo (DELETE) e cálculo de multa
 - [ ] TODO: `v1.0` Finalização do projeto básico.
@@ -97,7 +97,7 @@ Configuração de banco de dados:
 - Senha do usuário biblioadmin: definida durante criação do usuário (visto a seguir)
 - Senha do usuário `postgres`, administrador do banco de dados foi definida em um arquivo que será lido pelo PostgreSQL durante inicialização (criação da instância).
 - Nome das tabelas: ***tb_livros***, ***tb_membros*** e ***tb_emprestimos*** 
-- 
+
 Arquivos para criar imagens Docker para PostgreSQL:
 - `docker-compose-for-postgres-without-secrets.yml`  Arquivo básico para conf padrão: postgres; 5432
 - `docker-compose-for-postgres-with-secrets.yml`  Arquivo básico para conf que salva segredos (senhas, p.ex.) no sistema e torna disponível ao container sem que essa informação seja vazada em arquivos de texto (e venham parar no GitHub); porta:8432
@@ -118,6 +118,8 @@ Algumas considerações sobre as estruturas de dados:
 - Tabela **Emprestimos** (`tb_emprestimos`): Cada empréstimo associa um membro (`membro_id`) com um livro (`livro_id`). Ao realizar o empréstimo, deve ser especificada a data de devolução (`data_devolucao`) e o valor da multa por dia. O usuário membro saberá na data de empréstimo quanto será a multa devida por dia de atraso. Aqui, esse dado por vir de uma tabela que associa tipos de materiais com valores de multa (o modelo requer, neste caso, um campo de tipo de livro/material). Essa parte da modelagem não foi incluída visando minimizar complexidade.
 
 # Configuração básicas das classes e respectivas anotações Spring
+
+> Pacote base: package tech.ada.biblioteca
 
 Estrutura em pacotes para acomodar as respectivas classes que definem a estrutura básica de separação de responsabilidades:
 ```
@@ -145,13 +147,7 @@ Todas as três anotações são derivadas de `@Component`. Esta anotação e der
 
 A anotação `@Autowired` do Spring define atributos que são gerenciados automaticamente (objetos e dependências instanciados e destruídos). Ela define a ***injeção de dependência*** de uma classe em outra classe.
 
-
-Referência para o [Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html):
-
-> Pacote base: package tech.ada.biblioteca;
-
-Classe principal (base) do projeto anotada com `@SpringBootApplication`: meta-anotação que combina `@SpringBootConfiguration`, `@EnableAutoConfiguration` e `@ComponentScan`. Elas tratam da configuração automática, suporte a propriedades e gerenciamento das dependências (varredura de componentes no diretório do projeto) para prover um ambiente de execução das aplicações.
-
+Arquitetura básica usada para o projeto: [Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html). Classe principal (base) do projeto anotada com `@SpringBootApplication`: meta-anotação que combina `@SpringBootConfiguration`, `@EnableAutoConfiguration` e `@ComponentScan`. Elas tratam da configuração automática, suporte a propriedades e gerenciamento das dependências (varredura de componentes no diretório do projeto) para prover um ambiente de execução das aplicações.
 
 Para serviços REST, o [Spring MVC](https://www.baeldung.com/spring-mvc-tutorial) (Model-View-Controller) fornece anotações `@RestController` e `@RequestMapping`. A @RestController é anotação tipo *stereotype* que: facilita leitura e indica o que uma classe deve fazer (neste caso, tratar requisições Web). A @RequestMapping é base para todas as especializações de requisições HTTP. Exemplo: @PostMapping é equivalente a @RequestMapping(method=POST). @RestController é uma especialização e inclui as anotações `@Controller` e `@ResponseBody`.
 
@@ -318,18 +314,25 @@ Método POST para ***Membro***: sempre será criada a instância na base de dado
 
 ## Método DELETE
 
-Verbo RESTful DELETE para excluir uma entrada no banco de dados. Com sucesso, retorna HTTP Status ***200*** (***OK***), ou 404 (quando não encontrado). Segue um extrato referenciando o respectivo livro:
+Verbo RESTful DELETE para excluir uma entrada no banco de dados.
+- Com sucesso, retorna HTTP Status ***200*** (***OK***); ou
+- Em caso de insucesso, retorna 404 (quando não encontrado).
+Segue um extrato de informação sobre o método DELETE:
 > According to the RESTful Web Services Cookbook: *The DELETE method is idempotent. This implies that the server must return response code 200 (OK) even if the server deleted the resource in a previous request. But in practice, implementing DELETE as an idempotent operation requires the server to keep track of all deleted resources. Otherwise, it can return a 404 (Not Found). 
 >  A server MAY return a 404 Not Found status code if a deletion request fails due to the resource not existing.
 
+## Método PUT
 
+Verbo RESTful PUT para atualizar um item no repositório. O cliente deve especificar todos os atributos, incluindo aqueles que devem estar sujeitos a alteração. 
+- Sucesso: HTTP Status ***200*** (***OK***)
+- Insucesso: HTTP Status ***404*** (***NOT FOUND***)
 
 ## Respostas (códigos e mensagens)
 
 A anotação Spring `@RestController` indica que o `servlet dispatcher` usa ***HttpMessageConverters*** para retornar respostas raw ao cliente usando formatos json/xml.
 
 Padrão de mensagens (em JSON) de ***ERRO*** geradas pelo Spring:
-```json
+```
 HTTP/1.1 404
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
@@ -342,9 +345,9 @@ Date: Sat, 26 Dec 2020 19:38:09 GMT
 }
 ```
 Referências: [Spring ResponseStatusException](https://www.baeldung.com/spring-response-status-exception): por padrão, versões mais recentes do Spring não incluem mensagens de erro por questões de segurança. Argumentos para o construtor de Resposta HTTP: `ResponseStatusException`:
-- status – an HTTP status set to the HTTP response
-- reason – a message explaining the exception set to the HTTP response
-- cause – a Throwable cause of the ResponseStatusException
+- status – código de status HTTP
+- reason – mensagem explicativa da exceção
+- cause – causa Throwable para a ResponseStatusException
 
 > TODO: faltou implementar gerenciamento de erros mais robusto e respostas HTTP mais consistentes com a arquitetura RESTful.
 
@@ -355,7 +358,9 @@ Há um arquivo de script Bash Shell que usa o aplicativo curl ([cURL](https://cu
 $ chmod u+x sistemabiblio-test-api.sh
 $ ./sistemabiblio-test-api.sh
 ```
-Obs.: as requisições são geradas conforme o seguinte endereço: http://localhost:8082
+Observações:
+- As requisições são geradas conforme o seguinte endereço: http://localhost:8082
+- Alguns testes (os últimos) testam endpoints com métodos não permitidos (não suportados pelo servidor). Foi usado o método PATCH nos endpoints `/livros` e `/membros`.
 
 
 Referência geral:

@@ -48,4 +48,19 @@ public class MembroService {
         }
         return false;
     }
+
+    public Membro atualizarMembro(Membro membro) {
+        Optional<Membro> optionalMembro = this.membroRepository.findById(membro.getId());
+        if (optionalMembro.isPresent()) {
+            Membro membroAlterado = optionalMembro.get();
+            membroAlterado.setNome(membro.getNome());
+            membroAlterado.setSobrenome(membro.getSobrenome());
+            membroAlterado.setEndereco(membro.getEndereco());
+            membroAlterado.setContato(membro.getContato());
+            membroAlterado.setMultaAcumulada(membro.getMultaAcumulada());
+            return this.membroRepository.save(membroAlterado);
+        } else {
+            throw new RuntimeException("Membro não encontrado");
+        }
+    }
 }
