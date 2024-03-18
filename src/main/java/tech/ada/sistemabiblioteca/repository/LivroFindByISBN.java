@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import tech.ada.sistemabiblioteca.model.Livro;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LivroFindByISBN extends JpaRepository<Livro, String> {
-    List<Livro> findByIsbn(String isbn);
+    Optional<Livro> findByIsbn(String isbn);
 }

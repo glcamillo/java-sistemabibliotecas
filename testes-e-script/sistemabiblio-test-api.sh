@@ -88,8 +88,18 @@ $CMD -i --header 'Content-Type:application/json' -X PUT -d '{"id":1,"titulo":"Ja
 
 
 echo -e '\n\n ************      PUT Membro (contato:para@gmail.com)     *************************'
-echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":1,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros/membro \n"
+echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":1,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros \n"
 $CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":1,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros
+
+
+echo -e '\n\n ************  PUT Livro (sem ID -> CRIA ENTIDADE)  -> HTTP 201    *************************'
+echo -e "\n    $CURL -i -s --header 'Content-Type:application/json' -X PUT -d '{"titulo":"Java: como NÃO programar","isbn":"000-999999","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros \n"
+$CMD -i --header 'Content-Type:application/json' -X PUT -d '{"titulo":"Java: como NÃO programar","isbn":"000-999999","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros
+
+
+echo -e '\n\n ************  PUT Membro (sem ID -> CRIA ENTIDADE)  -> HTTP 201    *************************'
+echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"nome":"São Francisco","sobrenome":"em Minas Gerais","endereco":"Estado de Minas Gerais","contato":"+55 31 22233333","multaAcumulada":0}' http://localhost:8082/membros \n"
+$CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"nome":"São Francisco","sobrenome":"em Minas Gerais","endereco":"Estado de Minas Gerais","contato":"+55 31 22233333","multaAcumulada":0}' http://localhost:8082/membros
 
 
 
@@ -108,7 +118,7 @@ echo -e '\n\n *********    POST Livro  (ISBN já existe) -> HTTP 409   *********
 echo -e "\n    $CURL -i -s --header 'Content-Type:application/json' -X POST -d '{"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2016,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros \n"
 $CMD -i --header 'Content-Type:application/json' -X POST -d '{"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2016,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros
 
-echo -e '\n\n ***    POST Membro  (ISBN já existe) -> HTTP 201 (sempre será incluído, como novo Id)   ********'
+echo -e '\n\n ***    POST Membro  -> HTTP 201 (sempre será incluído, como novo Id)   ********'
 echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X POST -d '{"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"amazonas@para.com"}' http://localhost:8082/membros \n"
 $CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X POST -d '{"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"amazonas@para.com"}' http://localhost:8082/membros
 
@@ -126,15 +136,48 @@ $CMD -i -s -X DELETE 'http://localhost:8082/membros/20'
 
 
 
-echo -e '\n\n ************      PUT Livro (inexistente) -> 404     *************************'
+echo -e '\n\n ************      PUT Livro (inexistente) -> 400     *************************'
 echo -e "\n    $CURL -i -s --header 'Content-Type:application/json' -X PUT -d '{"id":300,"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros \n"
 $CMD -i --header 'Content-Type:application/json' -X PUT -d '{"id":300,"titulo":"Java: como programar","isbn":"978-8543004792","autorNome":"Harvey","autorSobrenome":"Deitel","anoPublicacao":2024,"editoraNome":"Pearson Education","emprestado":false}' http://localhost:8082/livros
 
 
-echo -e '\n\n ************      PUT Membro (inexistente) -> 404    *************************'
-echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":300,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros/membro \n"
+echo -e '\n\n ************      PUT Membro (inexistente) -> 400    *************************'
+echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":300,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros \n"
 $CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X PUT -d '{"id":300,"nome":"Amazonas","sobrenome":"no Pará","endereco":"Estado do Pará","contato":"para@gmail.com","multaAcumulada":0}' http://localhost:8082/membros
 
+
+echo -e '\n\n ************      PATCH Livro (altera titulo) -> 405     *************************'
+echo -e "\n    $CURL -i -s --header 'Content-Type:application/json' -X PATCH -d '{"id":1,"titulo":"Rust: como programar"}' http://localhost:8082/livros \n"
+$CMD -i --header 'Content-Type:application/json' -X PATCH -d '{"id":300,"titulo":"Rust: como programar"}' http://localhost:8082/livros
+
+
+echo -e '\n\n ************      PATCH Membro (altera nome) -> 405    *************************'
+echo -e "\n    $CURL -i -s -H 'Content-Type:application/json;charset=utf-8' -X PATCH -d '{"id":1,"nome":"Parana"}' http://localhost:8082/membros \n"
+$CMD -i -s -H 'Content-Type:application/json;charset=utf-8' -X PATCH -d '{"id":1,"nome":"Parana"}' http://localhost:8082/membros
+
+
+
+# Para PUT com erro LIVRO: http://localhost:8082/livros
+#{
+#    "id":300,
+#    "titulo":"Java: como programar",
+#    "isbn":"978-8543004792",
+#    "autorNome":"Harvey",
+#    "autorSobrenome":"Deitel",
+#    "anoPublicacao":2024,
+#    "editoraNome":"Pearson Education",
+#    "emprestado":false
+#}
+
+# Para PUT com erro MEMBRO: http://localhost:8082/membros
+#{
+#    "id":300,
+#    "nome":"Amazonas",
+#    "sobrenome":"no Pará",
+#    "endereco":"Estado do Pará",
+#    "contato":"para@gmail.com",
+#    "multaAcumulada":0
+#}
 
 
 

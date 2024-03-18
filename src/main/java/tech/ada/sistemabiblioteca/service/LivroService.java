@@ -32,6 +32,7 @@ public class LivroService {
         return this.livroRepository.findById(id).get();
     }
 
+    // Será verificado se ISBN de livro a incluir já não está na base
     public Livro salvarLivro(Livro livro){
         if (this.findLivroByISBN(livro)) {
             throw new RuntimeException("Livro com o mesmo valor de ISBN na base de dados.");
@@ -40,8 +41,8 @@ public class LivroService {
     }
 
     public boolean findLivroByISBN(Livro livro){
-        List<Livro> livroByISBN = this.livroFindByISBN.findByIsbn(livro.getIsbn());
-        return (livroByISBN.isEmpty()) ? false:true;
+        Optional<Livro> livroByISBN = this.livroFindByISBN.findByIsbn(livro.getIsbn());
+        return (livroByISBN.isPresent()) ? true:false;
     }
 
     public boolean removerLivroById(Long id) {
@@ -53,20 +54,39 @@ public class LivroService {
         return false;
     }
 
+    private boolean testaPresentaParametros(Livro livro){
+        if (livro.getTitulo() != null && livro.getIsbn() != null && livro.getAutorNome() != null &&
+            livro.getAutorSobrenome() != null && livro.getAnoPublicacao() != null &&
+            livro.getEditoraNome() != null && livro.getEmprestado() != null){
+            return true;
+        } else{
+            return false;
+        }
+    }
+
     public Livro atualizarLivro(Livro livro) {
-        Optional<Livro> optionalLivro = this.livroRepository.findById(livro.getId());
-        if (optionalLivro.isPresent()) {
-            Livro livroAlterado = optionalLivro.get();
-            livroAlterado.setTitulo(livro.getTitulo());
-            livroAlterado.setIsbn(livro.getIsbn());
-            livroAlterado.setAutorNome(livro.getAutorNome());
-            livroAlterado.setAutorSobrenome(livro.getAutorSobrenome());
-            livroAlterado.setAnoPublicacao(livro.getAnoPublicacao());
-            livroAlterado.setEditoraNome(livro.getEditoraNome());
-            livroAlterado.setEmprestado(livro.getEmprestado());
-            return this.livroRepository.save(livroAlterado);
+        Livro livroParaAtualizarCriar = null;
+        // ID informado -> ATUALIZA -> HTTP status 200
+        if (livro.getId() != null) {
+            Optional<Livro> optionalLivro = this.livroRepository.findById(livro.getId());
+            if (optionalLivro.isPresent()) {
+                Livro livroAlterado = optionalLivro.get();
+                livroAlterado.setId(livro.getId());
+                livroAlterado.setTitulo(livro.getTitulo());
+                livroAlterado.setIsbn(livro.getIsbn());
+                livroAlterado.setAutorNome(livro.getAutorNome());
+                livroAlterado.setAutorSobrenome(livro.getAutorSobrenome());
+                livroAlterado.setAnoPublicacao(livro.getAnoPublicacao());
+                livroAlterado.setEditoraNome(livro.getEditoraNome());
+                livroAlterado.setEmprestado(livro.getEmprestado());
+                livroParaAtualizarCriar = this.livroRepository.save(livroAlterado);
+            }
+        // ID NÃO informado -> CRIA entidade -> HTTP status 201
+        } else if (livro.getId() == null && testaPresentaParametros(livro)) {
+            livroParaAtualizarCriar = salvarLivro(livro);
         } else {
             throw new RuntimeException("Livro não encontrado");
         }
+        return livroParaAtualizarCriar;
     }
 }
