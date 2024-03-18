@@ -37,13 +37,16 @@ Este é um projeto que tem a finalidade de usar a linguagem Java para implementa
 
 ### Tags
 - [x] ~~`v0.3` Modelo definido com as classes; persistência em memória (H2); endpoints para Livro e Membro para consulta via GET (todos os dados)~~
-- [x] ~~TODO: `v0.4` Endpoints para consulta (GET) por Id de Livro e Membro~~
-- [x] ~~TODO: `v0.5` Endpoints para inclusão (POST) de Livro e Membro~~
-- [x] ~~TODO: `v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id~~
-- [x] ~~TODO: `v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id~~
+- [x] ~~`v0.4` Endpoints para consulta (GET) por Id de Livro e Membro~~
+- [x] ~~`v0.5` Endpoints para inclusão (POST) de Livro e Membro~~
+- [x] ~~`v0.6` Endpoints para remoção (DELETE) de Livro e Membro com base em Id~~
+- [x] ~~`v0.7` Endpoints para atualização (PUT) de Livro e Membro com base em Id~~
 - [ ] TODO: `v0.8` Endpoints para incluir empréstimo (POST) de Livro para um Membro
 - [ ] TODO: `v0.9` Endpoints para devolução de Livro e remoção de Empréstimo (DELETE) e cálculo de multa
 - [ ] TODO: `v1.0` Finalização do projeto básico.
+
+### Issues
+> TODO: implementação PUT não aderente à especificação [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (HTTP Semantics) pois se recebe uma requisição com representação que pode ser persistida (novo objeto), então método deve retornar ***201 (CREATED)***. [Referẽncia em RFC 9110 PUT](https://www.rfc-editor.org/rfc/rfc9110#name-put)..
 
 ## Frameworks de suporte
 
