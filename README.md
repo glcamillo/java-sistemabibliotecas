@@ -46,7 +46,8 @@ Este é um projeto que tem a finalidade de usar a linguagem Java para implementa
 - [ ] TODO: `v1.0` Finalização do projeto básico.
 
 ### Issues
-> TODO: implementação PUT não aderente à especificação [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (HTTP Semantics) pois se recebe uma requisição com representação que pode ser persistida (novo objeto), então método deve retornar ***201 (CREATED)***. [Referẽncia em RFC 9110 PUT](https://www.rfc-editor.org/rfc/rfc9110#name-put)..
+> ~~TODO~~: implementação PUT não aderente à especificação [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (HTTP Semantics) pois se recebe uma requisição com representação que pode ser persistida (novo objeto), então método deve retornar ***201 (CREATED)***. [Referẽncia em RFC 9110 PUT](https://www.rfc-editor.org/rfc/rfc9110#name-put).
+> Corrigido conforme seção sobre método PUT.
 
 ## Frameworks de suporte
 
@@ -327,8 +328,9 @@ Segue um extrato de informação sobre o método DELETE:
 ## Método PUT
 
 Verbo RESTful PUT para atualizar um item no repositório. O cliente deve especificar todos os atributos, incluindo aqueles que devem estar sujeitos a alteração. 
-- Sucesso: HTTP Status ***200*** (***OK***)
-- Insucesso: HTTP Status ***404*** (***NOT FOUND***)
+- Requisição ***com Id***: sucesso para alteração: HTTP Status ***200*** (***OK***)
+- Requisição ***sem Id***: sucesso para inclusão (***criação*** entidade): HTTP Status ***201*** (***CREATED***)
+- Insucesso no processamento devido: campos faltantes ou requisição sem Id para livro com ISBN já cadastrado: HTTP Status ***400*** (***BAD REQUEST***)
 
 ## Respostas (códigos e mensagens)
 
